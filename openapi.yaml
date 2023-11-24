@@ -1,0 +1,268 @@
+openapi: 3.0.0
+info:
+  title: appointments/reservations in the calendar
+  description: API for appointments in the calender
+  version: 1.0.1
+servers:
+  - url: http://localhost:8080
+
+paths:
+  /appointment-res:
+    get:
+      summary: Get All appointments Details
+      #operationId: oppointmentGET
+      responses:
+        '200':
+          description: Display all appointments details
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AppointmentArray"
+                  x-content-type: application/json
+                  x-swagger-router-controller: Default
+
+    post: # POST
+      summary: create a new appointment
+      operationId: appointmentPOST
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AppointmentArray"
+              required: true
+      responses:
+        '201':
+          description: appointment create successfully
+          x-swagger-router-controller: Default
+
+    delete:
+      summary: Delete a appointment by all
+      operationId: appointmentsBulk_DELETE
+      responses:
+        '204':
+          description: appointments deleted successfully
+        '400':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"      
+                x-swagger-router-controller: Default
+
+  /appointment-res/{service_id}:
+    parameters:
+      - name: service_id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      summary: Get a appointment by service_id
+
+      responses:
+        '200':
+          description: A appointment
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Appointment"
+
+    put:
+      summary: Update appointment by service_id
+      operationId: appointmentIdPUT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Appointment"
+              required: true
+      responses:
+        '200':
+          description: employee updated successfully
+        '400':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+                x-swagger-router-controller: Default
+
+    post:
+      summary: Update Customer name of the appointment
+      description: ""
+      operationId: updateoppointmentWithNewName
+      parameters:
+      - name: cusname
+        in: query
+        description: Name of customer that needs to be updated
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: stime
+        in: query
+        description: New appointment start time that needs to be updated
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: time
+      - name: etime
+        in: query
+        description: New appointment end time that needs to be updated
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: time
+
+      responses:
+        "405":
+          description: Invalid input
+      x-swagger-router-controller: Default            
+
+    delete:
+      summary: Delete a appointment by service_id
+      operationId: appointmentIdDELETE
+      responses:
+        '204':
+          description: appointment deleted successfully
+        '400':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"              
+                x-swagger-router-controller: Default
+
+  /appointment-res/{cusname}:
+    parameters:
+      - name: cusname
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Get a appointment by customer name
+      operationId: appointmentsBy_customerGET
+      responses:
+        '200':
+          description: A appointment
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                $ref: "#/components/schemas/Appointment" 
+                x-content-type: application/json
+      x-swagger-router-controller: Default
+
+  /appointment-res/{stime}{etime}:
+    parameters:
+      - name: stime
+        in: path
+        required: true
+        schema:
+          type: string
+
+      - name: etime
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Get a appointment by time period
+      operationId: appointmentsIn_time_periodGET
+      responses:
+        '200':
+          description: A appointment
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                $ref: "#/components/schemas/Appointment" 
+                x-content-type: application/json
+      x-swagger-router-controller: Default
+
+    
+
+components:
+  schemas:
+    Appointment:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: "Meeting with client"  
+        cusname:
+          type: string
+          example: "Jhon devid"
+        date:
+          type: string
+          format: date
+          example: "2023-10-07"
+        stime:
+          type: string
+          format: time
+          example: "09:00:00"
+        etime:
+          type: string
+          format: time
+          example: "10:00:00" 
+        description:
+          type: string
+          example: "Discuss project details"  
+        location:
+          type: string
+          example: "office ABC"  
+    AppointmentArray:
+      type: array
+      items:
+      $ref: "#/components/schemas/Appointment"
+      example:
+        value:
+          - id: 25
+            title: "Meeting with Client"
+            cusname: "Smith"
+            date : "2023-10-15"
+            stime: "09:00:00"
+            etime: "10:00:00"
+            description: "Discuss project details"
+            location: "Room No.1"
+          - id: 28
+            title: "Meeting with Client"
+            cusname: "Devid"
+            date : "2023-10-18"
+            stime: "11:00:00"
+            etime: "12:00:00"
+            description: "Discuss project update details"
+            location: "Room No.5"
+          - id: 30
+            title: "Presentation"
+            cusname: "Smith"
+            date : "2023-10-20"
+            stime: "08:30:00"
+            etime: "09:30:00"
+            description: "Project progress presentation"
+            location: "Room No.1"
+    Error:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int16
+          example: 42
+        message:
+          type: string
+          example: Error Message
