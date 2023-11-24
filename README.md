@@ -1,2 +1,1 @@
-# task-app
-task management app assesment
+Mini project 1 and Mini project 2
